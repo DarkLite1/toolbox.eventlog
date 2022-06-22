@@ -85,7 +85,14 @@ Function Import-EventLogParamsHC {
         [String]$LogName = 'HCScripts'
     )
 
-    New-EventLog -LogName $LogName -Source $Source -EA Ignore
+    if (
+        -not(
+            ([System.Diagnostics.EventLog]::Exists($LogName)) -and
+            [System.Diagnostics.EventLog]::SourceExists($Source)
+        )
+    ) {
+        New-EventLog -LogName $LogName -Source $Source -ErrorAction Stop
+    }
 
     $EventParams = @{
         LogName     = $LogName
